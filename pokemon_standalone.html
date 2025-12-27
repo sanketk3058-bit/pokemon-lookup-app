@@ -68,9 +68,10 @@
     }
 
     .label { display: block; margin-bottom: 12px; color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
-    .row { display: flex; gap: 0; }
+    .row { display: flex; gap: 10px; align-items: flex-end; }
+    .input-group { flex: 1; display: flex; flex-direction: column; gap: 8px; }
     .input {
-      flex: 1;
+      width: 100%;
       padding: 14px;
       border: 2px solid var(--border);
       background: #000;
@@ -80,6 +81,7 @@
       text-transform: lowercase;
     }
     .input:focus { border-color: var(--accent); }
+    
     .button {
       padding: 14px 24px;
       border: 2px solid var(--accent);
@@ -93,6 +95,60 @@
     }
     .button:hover { background: transparent; color: var(--accent); }
     .button[disabled] { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); }
+
+    .compare-toggle {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 4px 8px;
+      font-size: 10px;
+      cursor: pointer;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+      align-self: flex-start;
+    }
+    .compare-toggle.active {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .hidden { display: none !important; }
+
+    .comparison-layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+    @media (min-width: 1024px) {
+      .comparison-layout {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .comparison-layout > div {
+      min-width: 0; /* Allow grid items to shrink below their content size */
+    }
+
+    .summary-card {
+      background: rgba(57, 255, 20, 0.05);
+      border: 1px solid var(--accent);
+      padding: 15px;
+      margin-bottom: 20px;
+      font-size: 12px;
+    }
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+    }
+    .summary-item { border-left: 2px solid var(--accent); padding-left: 10px; }
+
+    .right-panel { --accent: #00f0ff; } /* Cyber Blue for second pokemon */
+    .right-panel .badge { border-color: var(--accent); color: var(--accent); background: rgba(0, 240, 255, 0.05); }
+    .right-panel .bar > div { background: var(--accent); box-shadow: 0 0 10px var(--accent); }
+    .right-panel .evo-node { border-left-color: var(--accent); }
+    .right-panel .evo-node::before { background: var(--accent); }
+    .right-panel summary { color: var(--accent); }
 
     .help { margin: 12px 0 0; min-height: 18px; color: var(--danger); font-size: 12px; font-weight: bold; }
     .status { color: var(--accent); min-height: 22px; font-size: 14px; text-transform: uppercase; }
@@ -110,7 +166,15 @@
     .section h2::after { content: ""; flex: 1; height: 1px; background: var(--border); }
 
     .grid { display: grid; grid-template-columns: 1fr; gap: 1px; background: var(--border); border: 1px solid var(--border); }
-    @media (min-width: 820px) { .grid { grid-template-columns: 1fr 1fr; } }
+    @media (min-width: 820px) { 
+      .grid:not(.comparison-grid) { 
+        grid-template-columns: 1fr 1fr; 
+      } 
+    }
+    
+    .comparison-grid {
+      grid-template-columns: 1fr !important;
+    }
     
     .kv { 
       display: grid; 
@@ -118,9 +182,10 @@
       gap: 0; 
       background: var(--panel);
       padding: 12px;
+      min-width: 0; /* Allow content to wrap */
     }
-    .k { color: var(--muted); font-size: 11px; text-transform: uppercase; border-right: 1px solid var(--border); padding-right: 10px; }
-    .v { padding-left: 15px; font-weight: bold; color: var(--text); }
+    .k { color: var(--muted); font-size: 11px; text-transform: uppercase; border-right: 1px solid var(--border); padding-right: 10px; min-width: 0; }
+    .v { padding-left: 15px; font-weight: bold; color: var(--text); min-width: 0; word-break: break-word; }
 
     .badges { display: flex; flex-wrap: wrap; gap: 8px; }
     .badge { 
@@ -133,8 +198,8 @@
       font-weight: bold;
     }
 
-    .art { display: flex; gap: 30px; align-items: center; background: #000; padding: 20px; border: 1px solid var(--border); }
-    .art img { width: 160px; height: 160px; object-fit: contain; filter: drop-shadow(0 0 10px rgba(57, 255, 20, 0.2)); }
+    .art { display: flex; gap: 30px; align-items: center; background: #000; padding: 20px; border: 1px solid var(--border); flex-wrap: wrap; }
+    .art img { width: 160px; height: 160px; object-fit: contain; filter: drop-shadow(0 0 10px rgba(57, 255, 20, 0.2)); flex-shrink: 0; }
     
     .stats { display: grid; gap: 12px; }
     .stat { display: grid; grid-template-columns: 120px 40px 1fr; gap: 15px; align-items: center; font-size: 12px; }
@@ -145,7 +210,7 @@
     .small { color: var(--muted); font-size: 11px; text-transform: uppercase; }
     
     .list { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
-    .list li { padding: 6px 10px; border: 1px solid var(--border); font-size: 12px; background: rgba(255,255,255,0.02); }
+    .list li { padding: 6px 10px; border: 1px solid var(--border); font-size: 12px; background: rgba(255,255,255,0.02); word-break: break-word; }
     
     details { border: 1px solid var(--border); background: #000; }
     summary { padding: 12px; cursor: pointer; font-size: 12px; text-transform: uppercase; color: var(--accent); font-weight: bold; }
@@ -176,10 +241,18 @@
     </header>
     <section class="card">
       <form id="searchForm" novalidate>
-        <label class="label" for="pokemonName">Pokemon name</label>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <label class="label" for="pokemonName">Pokemon search</label>
+          <button type="button" id="compareToggle" class="compare-toggle">Compare Mode: OFF</button>
+        </div>
         <div class="row">
-          <input id="pokemonName" type="text" class="input" placeholder="e.g., pikachu" />
-          <button id="submitBtn" type="submit" class="button">Show Pokemon Info</button>
+          <div class="input-group">
+            <input id="pokemonName" type="text" class="input" placeholder="e.g., pikachu" />
+          </div>
+          <div id="secondInputGroup" class="input-group hidden">
+            <input id="pokemonName2" type="text" class="input" placeholder="e.g., charmander" />
+          </div>
+          <button id="submitBtn" type="submit" class="button">Show Info</button>
         </div>
         <p id="validation" class="help" role="alert"></p>
       </form>
@@ -216,12 +289,6 @@ function titleize(name) {
   return name.split("-").map(p => p.charAt(0).toUpperCase() + p.slice(1)).join("-");
 }
 
-async function fetchJson(url) {
-  const resp = await fetch(url);
-  if (!resp.ok) throw new Error(resp.status);
-  return resp.json();
-}
-
 function statLabel(name) {
   const map = { hp: "HP", attack: "Attack", defense: "Defense", "special-attack": "Sp. Atk", "special-defense": "Sp. Def", speed: "Speed" };
   return map[name] || name;
@@ -233,27 +300,30 @@ function renderBadges(items) {
   return wrap;
 }
 
-function renderKV(pairs) {
-  const grid = el("div", { class: "grid" });
+function renderKV(pairs, isComparison = false) {
+  const grid = el("div", { class: isComparison ? "grid comparison-grid" : "grid" });
   for (const [k, v] of pairs) {
     grid.appendChild(el("div", { class: "kv" }, [el("div", { class: "k", text: k }), el("div", { class: "v", text: v })]));
   }
   return grid;
 }
 
-async function loadPokemon(name) {
-  const pokemon = await fetchJson(`${API}/pokemon/${name}`);
-  const species = await fetchJson(`${API}/pokemon-species/${name}`);
+async function fetchJson(url) {
+  const resp = await fetch(url);
+  if (!resp.ok) throw new Error(resp.status);
+  return resp.json();
+}
 
-  const results = $("results");
-  clearNode(results);
+function calculateBST(stats) {
+  return stats.reduce((acc, s) => acc + s.base_stat, 0);
+}
 
+function renderPokemonData(pokemon, species, container, isComparison = false) {
   const sprites = pokemon.sprites || {};
   const imgUrl = sprites.other?.["official-artwork"]?.front_default || sprites.front_default;
-
   const types = (pokemon.types || []).sort((a, b) => a.slot - b.slot).map(t => t.type?.name).filter(Boolean);
 
-  results.appendChild(el("div", { class: "section" }, [
+  container.appendChild(el("div", { class: "section" }, [
     el("h2", { text: `IDENTIFIED: ${pokemon.name.toUpperCase()} (#${pokemon.id})` }),
     el("div", { class: "art" }, [
       imgUrl ? el("img", { src: imgUrl, alt: `${titleize(pokemon.name)} image` }) : null,
@@ -265,9 +335,9 @@ async function loadPokemon(name) {
   const heightM = pokemon.height != null ? (pokemon.height / 10).toFixed(1) + " m" : "Unknown";
   const weightKg = pokemon.weight != null ? (pokemon.weight / 10).toFixed(1) + " kg" : "Unknown";
 
-  results.appendChild(el("div", { class: "section" }, [
+  container.appendChild(el("div", { class: "section" }, [
     el("h2", { text: "Classification & Size" }),
-    renderKV([["Height", heightM], ["Weight", weightKg], ["Base experience", pokemon.base_experience ?? "Unknown"], ["Genus", genus]])
+    renderKV([["Height", heightM], ["Weight", weightKg], ["Base experience", pokemon.base_experience ?? "Unknown"], ["Genus", genus]], isComparison)
   ]));
 
   const statsWrap = el("div", { class: "stats" });
@@ -280,26 +350,26 @@ async function loadPokemon(name) {
       el("div", { class: "bar" }, [el("div", { style: `width: ${pct}%;` })])
     ]));
   }
-  results.appendChild(el("div", { class: "section" }, [el("h2", { text: "Base Stats" }), statsWrap]));
+  container.appendChild(el("div", { class: "section" }, [el("h2", { text: "Base Stats" }), statsWrap]));
 
   const abilitiesList = el("ul", { class: "list" });
   for (const a of pokemon.abilities || []) {
     const label = `${titleize(a.ability?.name)}${a.is_hidden ? " (Hidden)" : ""}`;
     abilitiesList.appendChild(el("li", {}, [el("strong", { text: label })]));
   }
-  results.appendChild(el("div", { class: "section" }, [el("h2", { text: "Abilities" }), abilitiesList]));
+  container.appendChild(el("div", { class: "section" }, [el("h2", { text: "Abilities" }), abilitiesList]));
 
   const moveList = el("ul", { class: "list" });
   for (const m of (pokemon.moves || []).slice(0, 30)) {
     moveList.appendChild(el("li", { text: titleize(m.move?.name) }));
   }
   const movesDetails = el("details", {}, [el("summary", { text: `Moves (${pokemon.moves?.length || 0})` }), moveList]);
-  results.appendChild(el("div", { class: "section" }, [el("h2", { text: "Moves" }), movesDetails]));
+  container.appendChild(el("div", { class: "section" }, [el("h2", { text: "Moves" }), movesDetails]));
 
   const flavor = (species.flavor_text_entries || []).find(f => f.language?.name === "en")?.flavor_text?.replace(/[\n\f]/g, " ") || "Unknown";
   const eggGroups = (species.egg_groups || []).map(g => titleize(g.name)).join(", ") || "Unknown";
 
-  results.appendChild(el("div", { class: "section" }, [
+  container.appendChild(el("div", { class: "section" }, [
     el("h2", { text: "Species & Flavor" }),
     renderKV([
       ["Color", titleize(species.color?.name) || "Unknown"],
@@ -309,11 +379,12 @@ async function loadPokemon(name) {
       ["Growth rate", titleize(species.growth_rate?.name) || "Unknown"],
       ["Egg groups", eggGroups],
       ["Shape", titleize(species.shape?.name) || "Unknown"]
-    ]),
+    ], isComparison),
     el("div", { class: "section" }, [el("h2", { text: "Flavor Text" }), el("div", { class: "small", text: flavor })])
   ]));
+}
 
-  // Type matchups
+async function getTypeMatchups(types) {
   const typeData = await Promise.all(types.map(t => fetchJson(`${API}/type/${t}`)));
   const mult = {};
   for (const td of typeData) {
@@ -328,64 +399,160 @@ async function loadPokemon(name) {
     else if (m > 1) weak.push(`${titleize(t)} (${m}×)`);
     else if (m < 1) resist.push(`${titleize(t)} (${m}×)`);
   }
-  results.appendChild(el("div", { class: "section" }, [
-    el("h2", { text: "Type Matchups" }),
-    renderKV([
-      ["Weaknesses", weak.join(", ") || "None"],
-      ["Resistances", resist.join(", ") || "None"],
-      ["Immunities", immune.join(", ") || "None"]
-    ])
-  ]));
+  return { weak, resist, immune };
+}
 
-  // Evolution chain
-  if (species.evolution_chain?.url) {
-    try {
-      const chain = await fetchJson(species.evolution_chain.url);
-      function renderEvo(node) {
-        const name = node.species?.name;
-        const li = el("li", { class: "evo-node" });
-        li.appendChild(el("strong", { text: titleize(name) }));
-        const details = node.evolution_details?.[0];
-        if (details) {
-          const parts = [];
-          if (details.trigger?.name) parts.push(`trigger: ${details.trigger.name}`);
-          if (details.min_level) parts.push(`min level: ${details.min_level}`);
-          if (details.item?.name) parts.push(`item: ${details.item.name}`);
-          if (details.held_item?.name) parts.push(`held item: ${details.held_item.name}`);
-          if (details.time_of_day) parts.push(`time: ${details.time_of_day}`);
-          if (parts.length) li.appendChild(el("div", { class: "small", text: parts.join(" • ") }));
-        }
-        if (node.evolves_to?.length) {
-          const ul = el("ul", { class: "evo" });
-          for (const child of node.evolves_to) ul.appendChild(renderEvo(child));
-          li.appendChild(ul);
-        }
-        return li;
-      }
-      const evoList = el("ul", { class: "evo" }, [renderEvo(chain.chain)]);
-      results.appendChild(el("div", { class: "section" }, [el("h2", { text: "Evolution Chain" }), evoList]));
-    } catch { /* ignore */ }
+async function getEvolutionChain(species) {
+  if (!species.evolution_chain?.url) return null;
+  return fetchJson(species.evolution_chain.url);
+}
+
+function renderEvoNode(node) {
+  const name = node.species?.name;
+  const li = el("li", { class: "evo-node" });
+  li.appendChild(el("strong", { text: titleize(name) }));
+  const details = node.evolution_details?.[0];
+  if (details) {
+    const parts = [];
+    if (details.trigger?.name) parts.push(`trigger: ${details.trigger.name}`);
+    if (details.min_level) parts.push(`min level: ${details.min_level}`);
+    if (details.item?.name) parts.push(`item: ${details.item.name}`);
+    if (details.held_item?.name) parts.push(`held item: ${details.held_item.name}`);
+    if (details.time_of_day) parts.push(`time: ${details.time_of_day}`);
+    if (parts.length) li.appendChild(el("div", { class: "small", text: parts.join(" • ") }));
+  }
+  if (node.evolves_to?.length) {
+    const ul = el("ul", { class: "evo" });
+    for (const child of node.evolves_to) ul.appendChild(renderEvoNode(child));
+    li.appendChild(ul);
+  }
+  return li;
+}
+
+async function loadPokemon(name, targetContainer = $("results"), isRight = false, isComparison = false) {
+  try {
+    const pokemon = await fetchJson(`${API}/pokemon/${name}`);
+    const species = await fetchJson(`${API}/pokemon-species/${name}`);
+    
+    const panel = el("div", { class: isRight ? "right-panel" : "" });
+    renderPokemonData(pokemon, species, panel, isComparison);
+
+    const types = (pokemon.types || []).map(t => t.type.name);
+    const matchups = await getTypeMatchups(types);
+    panel.appendChild(el("div", { class: "section" }, [
+      el("h2", { text: "Type Matchups" }),
+      renderKV([
+        ["Weaknesses", matchups.weak.join(", ") || "None"],
+        ["Resistances", matchups.resist.join(", ") || "None"],
+        ["Immunities", matchups.immune.join(", ") || "None"]
+      ], isComparison)
+    ]));
+
+    const evoChain = await getEvolutionChain(species);
+    if (evoChain) {
+      const evoList = el("ul", { class: "evo" }, [renderEvoNode(evoChain.chain)]);
+      panel.appendChild(el("div", { class: "section" }, [el("h2", { text: "Evolution Chain" }), evoList]));
+    }
+
+    targetContainer.appendChild(panel);
+    return { pokemon, species, matchups };
+  } catch (err) {
+    const errDiv = el("div", { class: "section" }, [
+      el("h2", { text: `ERROR: ${name.toUpperCase()}` }),
+      el("div", { class: "help", text: err.message === "404" ? "SUBJECT_NOT_FOUND" : "SYSTEM_FAILURE" })
+    ]);
+    targetContainer.appendChild(errDiv);
+    throw err;
   }
 }
+
+let compareMode = false;
+
+$("compareToggle").addEventListener("click", () => {
+  compareMode = !compareMode;
+  $("compareToggle").textContent = `Compare Mode: ${compareMode ? "ON" : "OFF"}`;
+  $("compareToggle").classList.toggle("active", compareMode);
+  $("secondInputGroup").classList.toggle("hidden", !compareMode);
+  $("submitBtn").textContent = compareMode ? "Compare" : "Show Info";
+});
 
 $("searchForm").addEventListener("submit", async (e) => {
   e.preventDefault();
   $("validation").textContent = "";
-  const raw = $("pokemonName").value.trim().toLowerCase();
-  if (!raw) { $("validation").textContent = "ERR: INPUT_REQUIRED"; return; }
+  const name1 = $("pokemonName").value.trim().toLowerCase();
+  const name2 = $("pokemonName2").value.trim().toLowerCase();
+
+  if (!name1 || (compareMode && !name2)) {
+    $("validation").textContent = "ERR: INPUT_REQUIRED";
+    return;
+  }
+
   $("submitBtn").disabled = true;
   $("status").textContent = "SCANNING_DATABASE...";
   const scanLine = el("div", { class: "loading-scan" });
   $("searchForm").parentElement.appendChild(scanLine);
   clearNode($("results"));
+
   try {
-    await loadPokemon(raw);
+    if (compareMode) {
+      window.location.hash = `p=${name1}+${name2}`;
+      const layout = el("div", { class: "comparison-layout" });
+      $("results").appendChild(layout);
+      
+      const [res1, res2] = await Promise.allSettled([
+        loadPokemon(name1, layout, false, true),
+        loadPokemon(name2, layout, true, true)
+      ]);
+
+      if (res1.status === "fulfilled" && res2.status === "fulfilled") {
+        const p1 = res1.value.pokemon;
+        const p2 = res2.value.pokemon;
+        const bst1 = calculateBST(p1.stats);
+        const bst2 = calculateBST(p2.stats);
+        
+        const summary = el("div", { class: "summary-card" }, [
+          el("h2", { text: "COMPARISON_SUMMARY" }),
+          el("div", { class: "summary-grid" }, [
+            el("div", { class: "summary-item" }, [
+              el("div", { class: "small", text: "BST Comparison" }),
+              el("div", { text: `${titleize(p1.name)}: ${bst1} vs ${titleize(p2.name)}: ${bst2}` }),
+              el("div", { class: "mono", text: bst1 > bst2 ? `${titleize(p1.name)} leads by ${bst1 - bst2}` : bst2 > bst1 ? `${titleize(p2.name)} leads by ${bst2 - bst1}` : "Equal BST" })
+            ]),
+            el("div", { class: "summary-item" }, [
+              el("div", { class: "small", text: "Type Advantage" }),
+              el("div", { text: "Check matchups below for detailed coverage." })
+            ])
+          ])
+        ]);
+        $("results").insertBefore(summary, layout);
+      }
+    } else {
+      window.location.hash = `p=${name1}`;
+      await loadPokemon(name1);
+    }
     $("status").textContent = "DATA_RETRIEVED";
   } catch (err) {
-    $("status").textContent = err.message === "404" ? "ERR: SUBJECT_NOT_FOUND" : "ERR: SYSTEM_FAILURE";
+    $("status").textContent = "ERR: SYSTEM_FAILURE";
   } finally {
     $("submitBtn").disabled = false;
     scanLine.remove();
+  }
+});
+
+window.addEventListener("load", () => {
+  const hash = window.location.hash;
+  if (hash.startsWith("#p=")) {
+    const parts = hash.slice(3).split("+");
+    if (parts.length === 2) {
+      compareMode = true;
+      $("compareToggle").click(); // Trigger UI update
+      $("pokemonName").value = parts[0];
+      $("pokemonName2").value = parts[1];
+      $("searchForm").dispatchEvent(new Event("submit"));
+    } else if (parts.length === 1) {
+      $("pokemonName").value = parts[0];
+      $("searchForm").dispatchEvent(new Event("submit"));
+    }
   }
 });
 </script>
