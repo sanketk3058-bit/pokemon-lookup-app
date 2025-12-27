@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pokemon Info (Standalone)</title>
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --panel: #141414;
+      --text: #f0f0f0;
+      --muted: #888;
+      --accent: #39ff14; /* Cyber Lime */
+      --border: #333;
+      --danger: #ff4d00; /* Safety Orange */
+      --font-mono: "JetBrains Mono", "Fira Code", monospace;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: var(--font-mono);
+      background-color: var(--bg);
+      background-image: 
+        linear-gradient(rgba(57, 255, 20, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(57, 255, 20, 0.03) 1px, transparent 1px);
+      background-size: 20px 20px;
+      color: var(--text);
+      line-height: 1.5;
+      overflow-x: hidden;
+    }
+    body::after {
+      content: "";
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%),
+                  linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+      background-size: 100% 4px, 3px 100%;
+      pointer-events: none;
+      z-index: 999;
+    }
+    .container { max-width: 1000px; margin: 0 auto; padding: 40px 20px; }
+    .header { 
+      border-left: 4px solid var(--accent);
+      padding-left: 20px;
+      margin-bottom: 40px;
+      text-transform: uppercase;
+    }
+    .title { margin: 0; font-size: 32px; letter-spacing: 2px; font-weight: 900; }
+    .subtitle { margin: 4px 0 0; color: var(--accent); font-size: 12px; opacity: 0.8; }
+    
+    .card {
+      background: var(--panel);
+      border: 2px solid var(--border);
+      padding: 24px;
+      margin-top: 20px;
+      position: relative;
+      clip-path: polygon(0 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%);
+    }
+    .card::before {
+      content: "DATA_NODE";
+      position: absolute;
+      top: -2px; right: 40px;
+      background: var(--border);
+      color: var(--bg);
+      font-size: 10px;
+      padding: 2px 8px;
+      font-weight: bold;
+    }
+
+    .label { display: block; margin-bottom: 12px; color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
+    .row { display: flex; gap: 0; }
+    .input {
+      flex: 1;
+      padding: 14px;
+      border: 2px solid var(--border);
+      background: #000;
+      color: var(--accent);
+      font-family: var(--font-mono);
+      outline: none;
+      text-transform: lowercase;
+    }
+    .input:focus { border-color: var(--accent); }
+    .button {
+      padding: 14px 24px;
+      border: 2px solid var(--accent);
+      background: var(--accent);
+      color: #000;
+      font-weight: 900;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .button:hover { background: transparent; color: var(--accent); }
+    .button[disabled] { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); }
+
+    .help { margin: 12px 0 0; min-height: 18px; color: var(--danger); font-size: 12px; font-weight: bold; }
+    .status { color: var(--accent); min-height: 22px; font-size: 14px; text-transform: uppercase; }
+    
+    .section { margin-top: 32px; border-top: 1px solid var(--border); padding-top: 20px; }
+    .section h2 { 
+      margin: 0 0 20px; 
+      font-size: 14px; 
+      text-transform: uppercase; 
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section h2::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+
+    .grid { display: grid; grid-template-columns: 1fr; gap: 1px; background: var(--border); border: 1px solid var(--border); }
+    @media (min-width: 820px) { .grid { grid-template-columns: 1fr 1fr; } }
+    
+    .kv { 
+      display: grid; 
+      grid-template-columns: 140px 1fr; 
+      gap: 0; 
+      background: var(--panel);
+      padding: 12px;
+    }
+    .k { color: var(--muted); font-size: 11px; text-transform: uppercase; border-right: 1px solid var(--border); padding-right: 10px; }
+    .v { padding-left: 15px; font-weight: bold; color: var(--text); }
+
+    .badges { display: flex; flex-wrap: wrap; gap: 8px; }
+    .badge { 
+      padding: 4px 12px; 
+      border: 1px solid var(--accent); 
+      color: var(--accent);
+      background: rgba(57, 255, 20, 0.05);
+      font-size: 11px; 
+      text-transform: uppercase;
+      font-weight: bold;
+    }
+
+    .art { display: flex; gap: 30px; align-items: center; background: #000; padding: 20px; border: 1px solid var(--border); }
+    .art img { width: 160px; height: 160px; object-fit: contain; filter: drop-shadow(0 0 10px rgba(57, 255, 20, 0.2)); }
+    
+    .stats { display: grid; gap: 12px; }
+    .stat { display: grid; grid-template-columns: 120px 40px 1fr; gap: 15px; align-items: center; font-size: 12px; }
+    .bar { height: 6px; background: #222; overflow: hidden; }
+    .bar > div { height: 100%; background: var(--accent); box-shadow: 0 0 10px var(--accent); }
+    
+    .mono { font-variant-numeric: tabular-nums; color: var(--accent); }
+    .small { color: var(--muted); font-size: 11px; text-transform: uppercase; }
+    
+    .list { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+    .list li { padding: 6px 10px; border: 1px solid var(--border); font-size: 12px; background: rgba(255,255,255,0.02); }
+    
+    details { border: 1px solid var(--border); background: #000; }
+    summary { padding: 12px; cursor: pointer; font-size: 12px; text-transform: uppercase; color: var(--accent); font-weight: bold; }
+    summary:hover { background: var(--border); }
+
+    .evo { margin: 0; padding: 0; list-style: none; }
+    .evo-node { border-left: 2px solid var(--accent); padding-left: 20px; margin: 20px 0; position: relative; }
+    .evo-node::before { content: ""; position: absolute; left: -6px; top: 0; width: 10px; height: 10px; background: var(--accent); }
+    
+    @keyframes scan {
+      0% { transform: translateY(-100%); }
+      100% { transform: translateY(100%); }
+    }
+    .loading-scan {
+      position: absolute; top: 0; left: 0; width: 100%; height: 2px;
+      background: var(--accent);
+      box-shadow: 0 0 15px var(--accent);
+      animation: scan 1.5s linear infinite;
+      z-index: 10;
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <header class="header">
+      <h1 class="title">Pokemon Info</h1>
+      <p class="subtitle">Enter a Pokemon name to view details.</p>
+    </header>
+    <section class="card">
+      <form id="searchForm" novalidate>
+        <label class="label" for="pokemonName">Pokemon name</label>
+        <div class="row">
+          <input id="pokemonName" type="text" class="input" placeholder="e.g., pikachu" />
+          <button id="submitBtn" type="submit" class="button">Show Pokemon Info</button>
+        </div>
+        <p id="validation" class="help" role="alert"></p>
+      </form>
+    </section>
+    <section class="card">
+      <div id="status" class="status"></div>
+    </section>
+    <section class="card">
+      <div id="results"></div>
+    </section>
+  </main>
+
+<script>
+const API = "https://pokeapi.co/api/v2";
+
+function $(id) { return document.getElementById(id); }
+function clearNode(node) { while (node.firstChild) node.removeChild(node.firstChild); }
+function el(tag, attrs = {}, children = []) {
+  const node = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (v == null) continue;
+    if (k === "class") node.className = v;
+    else if (k === "text") node.textContent = v;
+    else node.setAttribute(k, v);
+  }
+  for (const child of children) {
+    if (child == null) continue;
+    node.appendChild(typeof child === "string" ? document.createTextNode(child) : child);
+  }
+  return node;
+}
+function titleize(name) {
+  if (!name) return "";
+  return name.split("-").map(p => p.charAt(0).toUpperCase() + p.slice(1)).join("-");
+}
+
+async function fetchJson(url) {
+  const resp = await fetch(url);
+  if (!resp.ok) throw new Error(resp.status);
+  return resp.json();
+}
+
+function statLabel(name) {
+  const map = { hp: "HP", attack: "Attack", defense: "Defense", "special-attack": "Sp. Atk", "special-defense": "Sp. Def", speed: "Speed" };
+  return map[name] || name;
+}
+
+function renderBadges(items) {
+  const wrap = el("div", { class: "badges" });
+  for (const item of items) wrap.appendChild(el("span", { class: "badge", text: item }));
+  return wrap;
+}
+
+function renderKV(pairs) {
+  const grid = el("div", { class: "grid" });
+  for (const [k, v] of pairs) {
+    grid.appendChild(el("div", { class: "kv" }, [el("div", { class: "k", text: k }), el("div", { class: "v", text: v })]));
+  }
+  return grid;
+}
+
+async function loadPokemon(name) {
+  const pokemon = await fetchJson(`${API}/pokemon/${name}`);
+  const species = await fetchJson(`${API}/pokemon-species/${name}`);
+
+  const results = $("results");
+  clearNode(results);
+
+  const sprites = pokemon.sprites || {};
+  const imgUrl = sprites.other?.["official-artwork"]?.front_default || sprites.front_default;
+
+  const types = (pokemon.types || []).sort((a, b) => a.slot - b.slot).map(t => t.type?.name).filter(Boolean);
+
+  results.appendChild(el("div", { class: "section" }, [
+    el("h2", { text: `IDENTIFIED: ${pokemon.name.toUpperCase()} (#${pokemon.id})` }),
+    el("div", { class: "art" }, [
+      imgUrl ? el("img", { src: imgUrl, alt: `${titleize(pokemon.name)} image` }) : null,
+      el("div", {}, [el("div", { class: "small", text: "Type Classification" }), renderBadges(types.map(titleize))])
+    ])
+  ]));
+
+  const genus = (species.genera || []).find(g => g.language?.name === "en")?.genus || "Unknown";
+  const heightM = pokemon.height != null ? (pokemon.height / 10).toFixed(1) + " m" : "Unknown";
+  const weightKg = pokemon.weight != null ? (pokemon.weight / 10).toFixed(1) + " kg" : "Unknown";
+
+  results.appendChild(el("div", { class: "section" }, [
+    el("h2", { text: "Classification & Size" }),
+    renderKV([["Height", heightM], ["Weight", weightKg], ["Base experience", pokemon.base_experience ?? "Unknown"], ["Genus", genus]])
+  ]));
+
+  const statsWrap = el("div", { class: "stats" });
+  for (const s of pokemon.stats || []) {
+    const value = s.base_stat;
+    const pct = Math.max(0, Math.min(100, Math.round((value / 255) * 100)));
+    statsWrap.appendChild(el("div", { class: "stat" }, [
+      el("div", { text: statLabel(s.stat?.name) }),
+      el("div", { class: "mono", text: String(value) }),
+      el("div", { class: "bar" }, [el("div", { style: `width: ${pct}%;` })])
+    ]));
+  }
+  results.appendChild(el("div", { class: "section" }, [el("h2", { text: "Base Stats" }), statsWrap]));
+
+  const abilitiesList = el("ul", { class: "list" });
+  for (const a of pokemon.abilities || []) {
+    const label = `${titleize(a.ability?.name)}${a.is_hidden ? " (Hidden)" : ""}`;
+    abilitiesList.appendChild(el("li", {}, [el("strong", { text: label })]));
+  }
+  results.appendChild(el("div", { class: "section" }, [el("h2", { text: "Abilities" }), abilitiesList]));
+
+  const moveList = el("ul", { class: "list" });
+  for (const m of (pokemon.moves || []).slice(0, 30)) {
+    moveList.appendChild(el("li", { text: titleize(m.move?.name) }));
+  }
+  const movesDetails = el("details", {}, [el("summary", { text: `Moves (${pokemon.moves?.length || 0})` }), moveList]);
+  results.appendChild(el("div", { class: "section" }, [el("h2", { text: "Moves" }), movesDetails]));
+
+  const flavor = (species.flavor_text_entries || []).find(f => f.language?.name === "en")?.flavor_text?.replace(/[\n\f]/g, " ") || "Unknown";
+  const eggGroups = (species.egg_groups || []).map(g => titleize(g.name)).join(", ") || "Unknown";
+
+  results.appendChild(el("div", { class: "section" }, [
+    el("h2", { text: "Species & Flavor" }),
+    renderKV([
+      ["Color", titleize(species.color?.name) || "Unknown"],
+      ["Habitat", titleize(species.habitat?.name) || "Unknown"],
+      ["Capture rate", species.capture_rate ?? "Unknown"],
+      ["Base happiness", species.base_happiness ?? "Unknown"],
+      ["Growth rate", titleize(species.growth_rate?.name) || "Unknown"],
+      ["Egg groups", eggGroups],
+      ["Shape", titleize(species.shape?.name) || "Unknown"]
+    ]),
+    el("div", { class: "section" }, [el("h2", { text: "Flavor Text" }), el("div", { class: "small", text: flavor })])
+  ]));
+
+  // Type matchups
+  const typeData = await Promise.all(types.map(t => fetchJson(`${API}/type/${t}`)));
+  const mult = {};
+  for (const td of typeData) {
+    const rel = td.damage_relations || {};
+    for (const x of rel.double_damage_from || []) mult[x.name] = (mult[x.name] ?? 1) * 2;
+    for (const x of rel.half_damage_from || []) mult[x.name] = (mult[x.name] ?? 1) * 0.5;
+    for (const x of rel.no_damage_from || []) mult[x.name] = 0;
+  }
+  const weak = [], resist = [], immune = [];
+  for (const [t, m] of Object.entries(mult)) {
+    if (m === 0) immune.push(`${titleize(t)} (0×)`);
+    else if (m > 1) weak.push(`${titleize(t)} (${m}×)`);
+    else if (m < 1) resist.push(`${titleize(t)} (${m}×)`);
+  }
+  results.appendChild(el("div", { class: "section" }, [
+    el("h2", { text: "Type Matchups" }),
+    renderKV([
+      ["Weaknesses", weak.join(", ") || "None"],
+      ["Resistances", resist.join(", ") || "None"],
+      ["Immunities", immune.join(", ") || "None"]
+    ])
+  ]));
+
+  // Evolution chain
+  if (species.evolution_chain?.url) {
+    try {
+      const chain = await fetchJson(species.evolution_chain.url);
+      function renderEvo(node) {
+        const name = node.species?.name;
+        const li = el("li", { class: "evo-node" });
+        li.appendChild(el("strong", { text: titleize(name) }));
+        const details = node.evolution_details?.[0];
+        if (details) {
+          const parts = [];
+          if (details.trigger?.name) parts.push(`trigger: ${details.trigger.name}`);
+          if (details.min_level) parts.push(`min level: ${details.min_level}`);
+          if (details.item?.name) parts.push(`item: ${details.item.name}`);
+          if (details.held_item?.name) parts.push(`held item: ${details.held_item.name}`);
+          if (details.time_of_day) parts.push(`time: ${details.time_of_day}`);
+          if (parts.length) li.appendChild(el("div", { class: "small", text: parts.join(" • ") }));
+        }
+        if (node.evolves_to?.length) {
+          const ul = el("ul", { class: "evo" });
+          for (const child of node.evolves_to) ul.appendChild(renderEvo(child));
+          li.appendChild(ul);
+        }
+        return li;
+      }
+      const evoList = el("ul", { class: "evo" }, [renderEvo(chain.chain)]);
+      results.appendChild(el("div", { class: "section" }, [el("h2", { text: "Evolution Chain" }), evoList]));
+    } catch { /* ignore */ }
+  }
+}
+
+$("searchForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  $("validation").textContent = "";
+  const raw = $("pokemonName").value.trim().toLowerCase();
+  if (!raw) { $("validation").textContent = "ERR: INPUT_REQUIRED"; return; }
+  $("submitBtn").disabled = true;
+  $("status").textContent = "SCANNING_DATABASE...";
+  const scanLine = el("div", { class: "loading-scan" });
+  $("searchForm").parentElement.appendChild(scanLine);
+  clearNode($("results"));
+  try {
+    await loadPokemon(raw);
+    $("status").textContent = "DATA_RETRIEVED";
+  } catch (err) {
+    $("status").textContent = err.message === "404" ? "ERR: SUBJECT_NOT_FOUND" : "ERR: SYSTEM_FAILURE";
+  } finally {
+    $("submitBtn").disabled = false;
+    scanLine.remove();
+  }
+});
+</script>
+</body>
+</html>
